@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สถานะการสั่งซื้อสินค้า</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        h1 { color: #333; }
+        #status-table { width: 100%; border-collapse: collapse; margin-top: 20px; box-shadow: 0 2px 3px rgba(0,0,0,0.1); background-color: white; }
+        #status-table th, #status-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        #status-table th { background-color: #4CAF50; color: white; font-weight: bold; }
+        #status-table tr:nth-child(even){background-color: #f9f9f9;}
+        #status-table tr:hover {background-color: #f1f1f1;}
+        .loading { text-align: center; padding: 20px; font-size: 1.2em; color: #555; }
+    </style>
+</head>
+<body>
+
+    <h1>ติดตามสถานะการสั่งซื้อ</h1>
+    
+    <div style="margin-bottom: 20px;">
+        <label for="orderSearch">ค้นหาชื่อการสั่งสินค้า:</label>
+        <input type="text" id="orderSearch" onkeyup="filterTable()" placeholder="กรอกชื่อออเดอร์ของคุณ..." style="padding: 8px; width: 300px; border: 1px solid #ccc;">
+    </div>
+
+    <div id="loading-status" class="loading">กำลังโหลดข้อมูล...</div>
+
+    <table id="status-table">
+        <thead>
+            <tr>
+                <th>ชื่อการสั่งสินค้า</th>
+                <th>สั่งซื้อแล้ว?</th>
+                <th>สินค้ามาถึงแล้ว?</th>
+            </tr>
+        </thead>
+        <tbody id="status-table-body">
+            </tbody>
+    </table>
+
+    <script>
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTG6UZWFwX5nQ6g2Y9eODTXdriEB_fI9jEA3pQmdcOa6ufkAG-eTS99XcxbzT_jhoCXS-LJ5e8QvJDR/pub?gid=158806800&single=true&output=csv'; 
+        
+        const COL_AE = 30;
+        const COL_AG = 32;
+        const COL_AH = 33;
+
+        const tableBody = document.getElementById('status-table-body');
+        const loadingStatus = document.getElementById('loading-status');
+
+        fetch(CSV_URL)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Failed to fetch CSV: HTTP status ' + res.status);
+                }
+                return res.text();
+            })
+            .then(csvText => {
+                loadingStatus.style.display = 'none';
+                
+                const rows = csvText.split('\n');
+                
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (row.trim() === '') continue;
+
+                    const cells = row.split(','); 
+
+                    if (cells.length < COL_AH + 1) continue; 
+                    
+                    const itemAE = cells[COL_AE] ? cells[COL_AE].trim().replace(/"/g, '') : '';
+                    const statusAG = cells[COL_AG] ? cells[COL_AG].trim().replace(/"/g, '') : '';
+                    const statusAH = cells[COL_AH] ? cells[COL_AH].trim().replace(/"/g, '') : '';
+                    
+                    if (itemAE === '') continue;
+
+                    const tr = document.createElement('tr');
+                    
+                    const itemCell = document.createElement('td');
+                    itemCell.textContent = itemAE;
+                    tr.appendChild(itemCell);
+                    
+                    const orderedCell = document.createElement('td');
+                    orderedCell.textContent = statusAG || 'ยังไม่ระบุ';
+                    tr.appendChild(orderedCell);
+
+                    const arrivedCell = document.createElement('td');
+                    arrivedCell.textContent = statusAH || 'ยังไม่ระบุ';
+                    tr.appendChild(arrivedCell);
+
+                    tableBody.appendChild(tr);
+                }
+            })
+            .catch(error => {
+                loadingStatus.textContent = 'เกิดข้อผิดพลาดในการดึงข้อมูล: โปรดตรวจสอบลิงก์ CSV และการเผยแพร่';
+                console.error('Error fetching CSV data:', error);
+            });
+            
+        function filterTable() {
+            let input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("orderSearch");
+            filter = input.value.toUpperCase(); 
+            table = document.getElementById("status-table");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 1; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[0]; 
+                
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = ""; 
+                    } else {
+                        tr[i].style.display = "none"; 
+                    }
+                }       
+            }
+        }
+    </script>
+</body>
+</html>
