@@ -30,7 +30,8 @@
         <thead>
             <tr>
                 <th>ชื่อการสั่งสินค้า</th>
-                <th>สถานะโดยรวม</th>                 <th>สั่งซื้อแล้ว?</th>
+                <th>สถานะโดยรวม</th>
+                <th>สั่งซื้อแล้ว?</th>
                 <th>สินค้ามาถึงแล้ว?</th>
             </tr>
         </thead>
@@ -42,7 +43,7 @@
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTG6UZWFwX5nQ6g2Y9eODTXdriEB_fI9jEA3pQmdcOa6ufkAG-eTS99XcxbzT_jhoCXS-LJ5e8QvJDR/pub?gid=158806800&single=true&output=csv'; 
         
         const COL_AE = 30;
-        const COL_AF = 31; // คอลัมน์สถานะโดยรวม
+        const COL_AF = 31; 
         const COL_AG = 32;
         const COL_AH = 33;
         
@@ -70,7 +71,7 @@
                     if (cells.length < COL_AH + 1) continue; 
                     
                     const itemAE = cells[COL_AE] ? cells[COL_AE].trim().replace(/"/g, '') : '';
-                    const statusAF = cells[COL_AF] ? cells[COL_AF].trim().replace(/"/g, '') : ''; // ดึงค่าจากคอลัมน์ AF
+                    const statusAF = cells[COL_AF] ? cells[COL_AF].trim().replace(/"/g, '') : ''; 
                     const statusAG = cells[COL_AG] ? cells[COL_AG].trim().replace(/"/g, '') : '';
                     const statusAH = cells[COL_AH] ? cells[COL_AH].trim().replace(/"/g, '') : '';
                     
@@ -82,7 +83,7 @@
                     itemCell.textContent = itemAE;
                     tr.appendChild(itemCell);
                     
-                    const overallCell = document.createElement('td'); // สร้างเซลล์สำหรับคอลัมน์ AF
+                    const overallCell = document.createElement('td'); 
                     overallCell.textContent = statusAF || 'ยังไม่ระบุ';
                     tr.appendChild(overallCell);
                     
