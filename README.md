@@ -37,10 +37,11 @@
         </thead>
         <tbody id="status-table-body">
             </tbody>
-    </table>
+        </table>
 
     <script>
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTG6UZWFwX5nQ6g2Y9eODTXdriEB_fI9jEA3pQmdcOa6ufkAG-eTS99XcxbzT_jhoCXS-LJ5e8QvJDR/pub?gid=158806800&single=true&output=csv'; 
+
         
         const COL_AE = 30;
         const COL_AF = 31;
@@ -66,7 +67,7 @@
                     const row = rows[i];
                     if (row.trim() === '') continue;
 
-                    const cells = row.split(','); 
+                    const cells = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
 
                     if (cells.length < COL_AH + 1) continue; 
                     
